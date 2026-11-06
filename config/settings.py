@@ -12,8 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Cargar las variables de entorno
+load_dotenv()
 
 
 # Quick-start development settings - unsuitable for production
@@ -22,8 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-b3$$&ownyim2+zch5&x_xixo633m-19(y(=-pa&!**f(if$@n@'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Si en Render ponemos DEBUG=False, Django lo leerá. Si no existe la variable como en local, será True.
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -40,6 +43,9 @@ INSTALLED_APPS = [
     'rest_framework', # para construir las apis xd 
     'corsheaders', #Para las peticiones del front
     'poc_saludo',
+    'usuarios', # Manejo de usuarios (CRUD, etc)
+    'behave_django', # Para los test
+    'drf_spectacular', # Para documentar la api en Swagger
 ]
 
 MIDDLEWARE = [
@@ -77,10 +83,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -129,3 +147,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Por el momento voy a permitir que todos accedan a mi api 
 CORS_ALLOW_ALL_ORIGINS = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Croma API',
+    'DESCRIPTION': 'Documentación oficial del backend para el proyecto Croma.',
+    'VERSION': '1.0.0',
+    'SERVERS': [
+        {'url': 'https://api.croma.lat', 'description': 'Servidor de producción'},
+        # {'url': 'http://localhost:8000', 'description': 'Servidor local'},
+    ],
+}
