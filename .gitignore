@@ -1,0 +1,30 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Base de datos local de Django
+db.sqlite3
+db.sqlite3-journal
+
+# Secretos y entorno local (.env.example SÍ se sube: no tiene valores reales)
+.env
+
+# Editores
+.vscode/
+.idea/
+
+# Archivos del sistema operativo de Windows
+Thumbs.db
+
+# Generados por el proyecto
+staticfiles/
+schema.yml
+
+# Sobre los test del código:
+Resultados_Tests/
