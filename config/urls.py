@@ -1,13 +1,16 @@
-from django.urls import path, include  # Asegúrate de importar 'include'
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/',include('poc_saludo.urls')),
-    path('api/v1/usuarios/', include('usuarios.urls')),
+    path('usuarios/', include('usuarios.urls')),
 
-    # Rutas para la documentación OpenAPI / Swagger
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # Documentación OpenAPI / Swagger
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+
+    # La raíz del sitio lleva a la documentación
+    path('', RedirectView.as_view(pattern_name='swagger-ui', permanent=False)),
 ]
