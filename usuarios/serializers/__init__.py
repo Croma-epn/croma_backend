@@ -1,1 +1,5 @@
-from .registro import RegistroUsuarioSerializer
+from .registro import (
+    RegistroExitosoSerializer,
+    RegistroUsuarioSerializer,
+    UsuarioRegistradoSerializer,
+)
