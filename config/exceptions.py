@@ -1,5 +1,8 @@
 from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
 from rest_framework.views import exception_handler
+
+from usuarios import mensajes
 
 # Mensaje general para errores de validación (400). No viene de un CC.
 MENSAJE_DATOS_INVALIDOS = 'Revisa los datos ingresados.'
@@ -36,7 +39,11 @@ def manejador_de_errores(exc, context):
     errores = {}
     mensaje = None
 
-    if isinstance(datos, dict) and set(datos) == {'detail'}:
+    if isinstance(exc, (NotAuthenticated, AuthenticationFailed)):
+        # Petición sin access token, con uno vencido o alterado (incluye los errores de
+        # token de simplejwt, cuyo cuerpo trae campos extra). Un solo mensaje, y sin campos.
+        mensaje = mensajes.SESION_EXPIRADA
+    elif isinstance(datos, dict) and set(datos) == {'detail'}:
         # Error sin campo: 404, 405, 415, JSON mal formado...
         mensaje = str(datos['detail'])
     elif isinstance(datos, dict):

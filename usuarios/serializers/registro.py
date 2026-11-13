@@ -2,28 +2,10 @@ from rest_framework import serializers
 
 from usuarios import mensajes
 
+from .comunes import CORREO_MAX_LENGTH, UsuarioSerializer, mensajes_campo_vacio
+
 NOMBRE_MAX_LENGTH = 100      # Debe coincidir con Usuario.nombre (max_length del modelo)
-CORREO_MAX_LENGTH = 254      # Debe coincidir con Usuario.correo
 CONTRASENA_MIN_LENGTH = 6    # Regla del CC7
-
-
-# IMPORTANTE: el docstring de cada serializer, los help_text y los ejemplos se publican
-# en Swagger. Ahí solo va texto pensado para quien consume la API. Las notas internas
-# (criterios de aceptación, decisiones del equipo) van en comentarios con "#".
-
-
-def _mensajes_campo_vacio(mensaje):
-    """
-    Un campo puede venir "vacío" de cuatro maneras: no enviado (required),
-    null, cadena vacía o solo espacios (blank), o con un tipo raro (invalid).
-    Todas devuelven el mismo mensaje del CC.
-    """
-    return {
-        'required': mensaje,
-        'null': mensaje,
-        'blank': mensaje,
-        'invalid': mensaje,
-    }
 
 
 class RegistroUsuarioSerializer(serializers.Serializer):
@@ -36,7 +18,7 @@ class RegistroUsuarioSerializer(serializers.Serializer):
         max_length=NOMBRE_MAX_LENGTH,
         help_text='Nombre completo. Máximo 100 caracteres.',
         error_messages={
-            **_mensajes_campo_vacio(mensajes.NOMBRE_OBLIGATORIO),
+            **mensajes_campo_vacio(mensajes.NOMBRE_OBLIGATORIO),
             'max_length': mensajes.NOMBRE_MUY_LARGO,
         },
     )
@@ -60,7 +42,7 @@ class RegistroUsuarioSerializer(serializers.Serializer):
         style={'input_type': 'password'},
         help_text='Contraseña de al menos 6 caracteres.',
         error_messages={
-            **_mensajes_campo_vacio(mensajes.CONTRASENA_CORTA),
+            **mensajes_campo_vacio(mensajes.CONTRASENA_CORTA),
             'min_length': mensajes.CONTRASENA_CORTA,
         },
     )
@@ -70,14 +52,8 @@ class RegistroUsuarioSerializer(serializers.Serializer):
         return value.lower()
 
 
-class UsuarioRegistradoSerializer(serializers.Serializer):
+class UsuarioRegistradoSerializer(UsuarioSerializer):
     """Datos del usuario creado."""
-
-    # Nunca incluye la contraseña.
-
-    id = serializers.IntegerField(read_only=True, help_text='Identificador del usuario.')
-    nombre = serializers.CharField(read_only=True, help_text='Nombre completo.')
-    correo = serializers.EmailField(read_only=True, help_text='Correo electrónico, en minúsculas.')
 
 
 class RegistroExitosoSerializer(serializers.Serializer):
