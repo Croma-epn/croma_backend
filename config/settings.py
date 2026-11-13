@@ -226,6 +226,13 @@ SIMPLE_JWT = {
     # usuarios/services/sesion.py de forma explícita.
 }
 
+# Cookie que transporta el refresh token. La crea y la borra el back; el front no la toca
+# (JavaScript no puede leerla porque es HttpOnly).
+REFRESH_COOKIE_NAME = 'croma_refresh'
+REFRESH_COOKIE_PATH = '/usuarios/'      # Solo se envía a las rutas de /usuarios/
+REFRESH_COOKIE_SECURE = not DEBUG       # En producción solo viaja por HTTPS
+REFRESH_COOKIE_SAMESITE = 'Lax'         # No se envía desde otros sitios: protege contra CSRF
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Croma API',
     'DESCRIPTION': (
