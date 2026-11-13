@@ -222,10 +222,8 @@ SIMPLE_JWT = {
     # Refresh token: solo sirve para pedir un access nuevo. Define cuánto dura la sesión
     # sin volver a escribir la contraseña.
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    # Cada vez que se usa el refresh se entrega uno nuevo y el anterior queda en la lista
-    # negra: un refresh robado deja de servir en cuanto el usuario legítimo lo usa.
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    # La rotación (un refresh de un solo uso, con lista negra) la hace el servicio
+    # usuarios/services/sesion.py de forma explícita.
 }
 
 SPECTACULAR_SETTINGS = {
