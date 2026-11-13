@@ -3,6 +3,7 @@ Configuración de Django para el backend de Croma.
 """
 
 import os
+from datetime import timedelta
 from importlib.util import find_spec
 from pathlib import Path
 
@@ -76,6 +77,7 @@ INSTALLED_APPS = [
     'rest_framework',     # Construcción de la API
     'corsheaders',        # Peticiones desde el front (otro origen)
     'drf_spectacular',    # Documentación OpenAPI / Swagger
+    'rest_framework_simplejwt.token_blacklist',  # Lista negra de refresh tokens (cierre de sesión)
     # Propias
     'usuarios',
 ]
@@ -184,6 +186,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS')
 
+# Permite que el navegador envíe y reciba cookies en peticiones desde el front
+# (el refresh token viaja en una cookie). El front debe usar credentials: 'include'.
+CORS_ALLOW_CREDENTIALS = True
+
 
 # ---------------------------------------------------------------------------
 # Django REST Framework y Swagger
@@ -194,7 +200,38 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
     'DEFAULT_PARSER_CLASSES': ['rest_framework.parsers.JSONParser'],
     'EXCEPTION_HANDLER': 'config.exceptions.manejador_de_errores',
+    # Quién eres: se lee el access token de la cabecera "Authorization: Bearer <token>".
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    # Qué puedes hacer: por defecto TODO endpoint exige sesión iniciada.
+    # Los públicos (registro, login...) lo declaran explícitamente con AllowAny.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
+
+# ---------------------------------------------------------------------------
+# Tokens de sesión (JWT)
+# ---------------------------------------------------------------------------
+
+SIMPLE_JWT = {
+    # Access token: se envía en cada petición. Dura poco para limitar el daño si se filtra.
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    # Refresh token: solo sirve para pedir un access nuevo. Define cuánto dura la sesión
+    # sin volver a escribir la contraseña.
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    # La rotación (un refresh de un solo uso, con lista negra) la hace el servicio
+    # usuarios/services/sesion.py de forma explícita.
+}
+
+# Cookie que transporta el refresh token. La crea y la borra el back; el front no la toca
+# (JavaScript no puede leerla porque es HttpOnly).
+REFRESH_COOKIE_NAME = 'croma_refresh'
+REFRESH_COOKIE_PATH = '/usuarios/'      # Solo se envía a las rutas de /usuarios/
+REFRESH_COOKIE_SECURE = not DEBUG       # En producción solo viaja por HTTPS
+REFRESH_COOKIE_SAMESITE = 'Lax'         # No se envía desde otros sitios: protege contra CSRF
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Croma API',
