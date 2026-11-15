@@ -27,4 +27,5 @@ staticfiles/
 schema.yml
 
 # Sobre los test del código:
-Resultados_Tests/
+informes/
+resultados_Tests
