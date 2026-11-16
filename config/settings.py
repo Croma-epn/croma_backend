@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',  # Lista negra de refresh tokens (cierre de sesión)
     # Propias
     'usuarios',
+    'proyectos',
 ]
 
 # behave-django solo está en requirements-dev.txt (no se instala en producción).
@@ -190,6 +191,19 @@ CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS')
 # (el refresh token viaja en una cookie). El front debe usar credentials: 'include'.
 CORS_ALLOW_CREDENTIALS = True
 
+
+# ---------------------------------------------------------------------------
+# Almacén de imágenes (portadas de los proyectos)
+# ---------------------------------------------------------------------------
+
+# Clase que guarda las imágenes. El resto del código solo conoce el contrato
+# (config/almacenamiento/__init__.py), así que cambiar de servicio es cambiar esta línea.
+# Para trabajar en local sin cuenta de Cloudinary se puede poner en el .env:
+#   ALMACEN_IMAGENES=config.almacenamiento.falso.AlmacenFalso
+ALMACEN_IMAGENES = os.environ.get(
+    'ALMACEN_IMAGENES',
+    'config.almacenamiento.cloudinary.AlmacenCloudinary',
+)
 
 # ---------------------------------------------------------------------------
 # Django REST Framework y Swagger
