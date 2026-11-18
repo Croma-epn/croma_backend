@@ -9,3 +9,4 @@ gunicorn==26.2.0
 dj-database-url==3.1.2
 djangorestframework-simplejwt==5.5.1
 pillow==13.0.0
+cloudinary==1.47.0
