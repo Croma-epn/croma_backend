@@ -6,6 +6,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('usuarios/', include('usuarios.urls')),
+    path('proyectos/', include('proyectos.urls')),
 
     # Documentación OpenAPI / Swagger
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -13,4 +14,5 @@ urlpatterns = [
 
     # La raíz del sitio lleva a la documentación
     path('', RedirectView.as_view(pattern_name='swagger-ui', permanent=False)),
+
 ]
