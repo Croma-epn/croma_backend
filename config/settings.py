@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',  # Lista negra de refresh tokens (cierre de sesión)
     # Propias
     'usuarios',
+    'proyectos',
 ]
 
 # behave-django solo está en requirements-dev.txt (no se instala en producción).
@@ -192,6 +193,19 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 # ---------------------------------------------------------------------------
+# Almacén de imágenes (portadas de los proyectos)
+# ---------------------------------------------------------------------------
+
+# Clase que guarda las imágenes. El resto del código solo conoce el contrato
+# (config/almacenamiento/__init__.py), así que cambiar de servicio es cambiar esta línea.
+# Para trabajar en local sin cuenta de Cloudinary se puede poner en el .env:
+#   ALMACEN_IMAGENES=config.almacenamiento.falso.AlmacenFalso
+ALMACEN_IMAGENES = os.environ.get(
+    'ALMACEN_IMAGENES',
+    'config.almacenamiento.cloudinary.AlmacenCloudinary',
+)
+
+# ---------------------------------------------------------------------------
 # Django REST Framework y Swagger
 # ---------------------------------------------------------------------------
 
@@ -245,5 +259,8 @@ SPECTACULAR_SETTINGS = {
     # Sin 'SERVERS': Swagger usa el mismo host desde el que se abre la documentación,
     # así que "Try it out" funciona en local y en producción sin editar nada.
     'SERVE_INCLUDE_SCHEMA': False,  # Quita el enlace /schema/ dentro del propio esquema
+    # Separa los esquemas de envío y de respuesta. Sin esto, Swagger muestra los campos
+    # de archivo como texto (uri) y no deja elegir una imagen para subir.
+    'COMPONENT_SPLIT_REQUEST': True,
 
 }
